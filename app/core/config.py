@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 from functools import lru_cache
+from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
 
 
 class Settings(BaseSettings):
@@ -26,15 +27,45 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_database_url(cls, v: str) -> str:
         """
-        Neon and Render provide postgres:// or postgresql:// URLs.
-        SQLAlchemy async requires postgresql+asyncpg://.
-        Auto-convert any variant so deployment just works.
+        Neon provides: postgresql://user:pass@host/db?sslmode=require&channel_binding=require
+        asyncpg needs:  postgresql+asyncpg://user:pass@host/db?ssl=require
+
+        1. Swap scheme to postgresql+asyncpg://
+        2. Replace psycopg2-style params with asyncpg equivalents
+        3. Drop unsupported params (channel_binding)
         """
+        # Fix scheme
         if v.startswith("postgres://"):
-            return v.replace("postgres://", "postgresql+asyncpg://", 1)
-        if v.startswith("postgresql://") and "+asyncpg" not in v:
-            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return v
+            v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif v.startswith("postgresql://") and "+asyncpg" not in v:
+            v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+        # Parse and clean query params
+        parsed = urlparse(v)
+        params = parse_qs(parsed.query, keep_blank_values=True)
+
+        # asyncpg doesn't understand sslmode= — translate to ssl=
+        if "sslmode" in params:
+            sslmode = params.pop("sslmode")[0]
+            # Map psycopg2 sslmode values → asyncpg ssl values
+            ssl_map = {
+                "require": "require",
+                "verify-ca": "require",
+                "verify-full": "require",
+                "disable": "disable",
+                "prefer": "require",
+                "allow": "require",
+            }
+            params["ssl"] = [ssl_map.get(sslmode, "require")]
+
+        # Drop params asyncpg doesn't support
+        for unsupported in ("channel_binding", "connect_timeout", "application_name"):
+            params.pop(unsupported, None)
+
+        # Rebuild URL
+        new_query = urlencode({k: v[0] for k, v in params.items()})
+        cleaned = urlunparse(parsed._replace(query=new_query))
+        return cleaned
 
     class Config:
         env_file = ".env"
