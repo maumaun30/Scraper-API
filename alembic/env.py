@@ -11,7 +11,7 @@ import app.models  # noqa: F401 — register all models
 config = context.config
 settings = get_settings()
 
-# Override sqlalchemy.url from .env
+# Alembic async engine still uses asyncpg; sync fallback strips it
 config.set_main_option("sqlalchemy.url", settings.database_url)
 
 if config.config_file_name is not None:
@@ -21,7 +21,8 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
+    # For offline mode use sync URL
+    url = settings.database_url.replace("+asyncpg", "")
     context.configure(
         url=url,
         target_metadata=target_metadata,
