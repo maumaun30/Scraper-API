@@ -1,0 +1,52 @@
+{
+  "list_urls": [
+    "https://www.solaireonline.com/egames/new",
+    "https://www.solaireonline.com/egames/table",
+    "https://www.solaireonline.com/egames/habanero",
+    "https://www.solaireonline.com/egames/jili",
+    "https://www.solaireonline.com/egames/pragmatic-play",
+    "https://www.solaireonline.com/egames/netent",
+    "https://www.solaireonline.com/egames/playtech"
+  ],
+
+  "list_item_selector": "article[data-testid='egames-card']",
+
+  "extract_from_list": true,
+
+  "fields": [
+    {
+      "name": "title",
+      "selector": "div.font-semibold.text-white",
+      "type": "text"
+    },
+    {
+      "name": "featured_image",
+      "selector": "figure img",
+      "type": "attribute",
+      "attribute": "src"
+    },
+    {
+      "name": "demo_url",
+      "selector": "a[data-testid='game-card-btn']",
+      "type": "attribute",
+      "attribute": "href"
+    },
+    {
+      "name": "has_demo",
+      "selector": "a[data-testid='game-card-btn']",
+      "type": "exists"
+    },
+    {
+      "name": "ribbon_label",
+      "selector": "div.font-bold.uppercase",
+      "type": "text"
+    }
+  ],
+
+  "pagination": {
+    "type": "load_more_button",
+    "button_selector": "button[data-testid='egames-load-more-btn']",
+    "max_clicks": 20,
+    "wait_after_click_ms": 2000
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "list_url": "https://www.solaireonline.com/egames/new",
+  "list_item_selector": "article[data-testid=egames-card]",
+  "detail_url_selector": "a[data-testid=game-card-btn]",
+  "fields": [
+    {
+      "name": "title",
+      "selector": ".font-semibold.text-white",
+      "type": "text",
+      "wp_field": "title"
+    },
+    {
+      "name": "content",
+      "selector": "div.entry-content",
+      "type": "html",
+      "wp_field": "content"
+    },
+    {
+      "name": "excerpt",
+      "selector": "p.excerpt",
+      "type": "text",
+      "wp_field": "excerpt"
+    },
+    {
+      "name": "featured_image",
+      "selector": "img",
+      "type": "attribute",
+      "attribute": "src",
+      "wp_field": "meta.featured_image_url"
+    },
+    {
+      "name": "published_date",
+      "selector": "time.published",
+      "type": "attribute",
+      "attribute": "datetime",
+      "wp_field": "meta.original_date"
+    },
+    {
+      "name": "source_url",
+      "selector": null,
+      "type": "current_url",
+      "wp_field": "meta.source_url"
+    }
+  ],
+  "pagination": {
+    "enabled": true,
+    "next_selector": "button[data-testid=egames-load-more-btn]",
+    "max_pages": 10
+  }
+}
