@@ -9,7 +9,6 @@ services:
       - .env
     volumes:
       - .:/app
-      - playwright_cache:/root/.cache/ms-playwright
     depends_on:
       db:
         condition: service_healthy
@@ -34,4 +33,3 @@ services:
 
 volumes:
   pg_data:
-  playwright_cache:

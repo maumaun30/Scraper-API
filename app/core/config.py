@@ -13,10 +13,6 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
-    # Scraper
-    target_url: str = ""
-    scraper_field_schema: str = "scraper_schema.json"
-
     # Scheduler (cron string)
     scrape_cron: str = "0 */6 * * *"
 
